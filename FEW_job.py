@@ -1,8 +1,4 @@
 import multiprocessing
-import numpy as np
-from few import FEW
-from sklearn.model_selection import cross_val_score
-import time
 
 # main functions
 def main():
@@ -17,7 +13,7 @@ def main():
 
     parser.add_argument('OUTPUT_FILE', type=str, help='File to export results.')
 
-    parser.add_argument('TRIAL', action='store',dest='TRIAL',type=str,
+    parser.add_argument('TRIAL', action='store',type=str,
                         default='0', help='Trial number')
 
     parser.add_argument('-h', '--help', action='help',
@@ -28,7 +24,7 @@ def main():
                         help='Character separating columns in the input file.')
 
     parser.add_argument('-g', action='store', dest='GENERATIONS', default=100,
-                        type=positive_integer,
+                        type=int,
                         help='Number of generations to run FEW.')
 
     parser.add_argument('-p', action='store', dest='POPULATION_SIZE',default=50,
@@ -37,11 +33,11 @@ def main():
                          'multiple of raw feature size.')
 
     parser.add_argument('-mr', action='store', dest='MUTATION_RATE',default=0.5,
-                        type=float_range,
+                        type=float,
                         help='GP mutation rate in the range [0.0, 1.0].')
 
     parser.add_argument('-xr', action='store', dest='CROSSOVER_RATE',
-                        default=0.5,type=float_range,
+                        default=0.5,type=float,
                         help='GP crossover rate in the range [0.0, 1.0].')
 
     parser.add_argument('-ml', action='store', dest='MACHINE_LEARNER',
@@ -53,15 +49,15 @@ def main():
                         '(classification)')
 
     parser.add_argument('-min_depth', action='store', dest='MIN_DEPTH',
-                        default=1,type=positive_integer,
+                        default=1,type=int,
                         help='Minimum length of GP programs.')
 
     parser.add_argument('-max_depth', action='store', dest='MAX_DEPTH',
-                        default=2,type=positive_integer,
+                        default=2,type=int,
                         help='Maximum number of nodes in GP programs.')
 
     parser.add_argument('-max_depth_init', action='store',dest='MAX_DEPTH_INIT',
-                        default=2,type=positive_integer,
+                        default=2,type=int,
                         help='Maximum nodes in initial programs.')
 
     parser.add_argument('-op_weight', action='store',dest='OP_WEIGHT',default=1,
@@ -69,7 +65,7 @@ def main():
                         ' features based on ML scores. Default: off')
 
     parser.add_argument('-ms', action='store', dest='MAX_STALL',default=100,
-                        type=positive_integer, help='If model CV does not '
+                        type=int, help='If model CV does not '
                         'improve for this many generations, end optimization.')
 
     parser.add_argument('--weight_parents', action='store_true',
@@ -86,7 +82,7 @@ def main():
                         type=str, help='Selection method (Default: tournament)')
 
     parser.add_argument('-tourn_size', action='store', dest='TOURN_SIZE',
-                        default=2, type=positive_integer,
+                        default=2, type=int,
                         help='Tournament size (Default: 2)')
 
     parser.add_argument('-fit', action='store', dest='FIT_CHOICE', default=None,
@@ -155,10 +151,6 @@ def main():
                         dest='DISABLE_UPDATE_CHECK', default=False,
                         help='Don''t check the FEW version.')
 
-    parser.add_argument('--version', action='version',
-                        version='FEW {version}'.format(version=__version__),
-                        help='Show FEW\'s version number and exit.')
-
     parser.add_argument('-method', action='store', dest='METHOD', type=str,
                         help="method name to store in output")
 
@@ -211,20 +203,53 @@ def main():
     runtime = time.time() - t0
 
     # print results
-    print('dataset\tmethod\ttrial\tparameters\tscore\ttime')
-    out_text = '\t'.join([dataset.split('/')[-1].split('.')[0],
+    print('dataset\tmethod\ttrial\tml\tscore\ttime')
+    out_text = '\t'.join([args.INPUT_FILE.split('/')[-1].split('.')[0],
                           args.METHOD,
                           args.TRIAL,
-                          str(learner.get_params()).replace('\n',' '),
+                          str(learner.ml_type),
                           str(np.mean(scores)),
-                          str(mean_time)])
+                          str(runtime)])
     # WIP: add printout of pareto archive
     # print summary results
-    with open(output_file,'a') as out:
+    with open(args.OUTPUT_FILE,'a') as out:
         out.write(out_text+'\n')
     print(out_text)
     sys.stdout.flush()
 
 if __name__ == '__main__':
     multiprocessing.set_start_method('forkserver')
+    import numpy as np
+    from few import FEW
+    from sklearn.model_selection import cross_val_score
+    import time
+    import argparse
+    import pandas as pd
+    import sys
+    from sklearn.linear_model import LassoLarsCV, LogisticRegression, SGDClassifier
+    from sklearn.svm import SVR, LinearSVR, SVC, LinearSVC
+    from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
+    from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+    from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
+    from DistanceClassifier import DistanceClassifier
+
+    # dictionary of ml options
+    ml_dict = {
+            'lasso': LassoLarsCV(),
+            'svr': SVR(),
+            'lsvr': LinearSVR(),
+            'lr': LogisticRegression(solver='sag'),
+            'sgd': SGDClassifier(loss='log',penalty='l1'),
+            'svc': SVC(),
+            'lsvc': LinearSVC(),
+            'rfc': RandomForestClassifier(),
+            'rfr': RandomForestRegressor(),
+            'dtc': DecisionTreeClassifier(),
+            'dtr': DecisionTreeRegressor(),
+            'dc': DistanceClassifier(),
+            'knc': KNeighborsClassifier(),
+            'knr': KNeighborsRegressor(),
+            None: None
+    }
+
     main()
