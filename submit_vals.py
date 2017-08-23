@@ -77,7 +77,7 @@ def main():
     print('save_file:',save_file)
     # write header
     with open(save_file,'w') as out:
-        out.write('dataset\tmethod\ttrial\tml\tscore\ttime\n')
+        out.write('dataset\tmethod\tmax_stall\ttrial\tml\tscore\ttime\n')
 
     ################################################################## regression problems
     for p in reg_problems:
@@ -97,8 +97,8 @@ def main():
                     ################################################# submit job with flag
                     bjob_line = ('bsub -o {OUT_FILE} -e {ERROR_FILE} -n {N_CORES} '
                                  '-J {JOB_NAME} -R "span[hosts=1]" '
-                                 '"python FEW_job.py {DATASET} {SAVE_FILE} {TRIAL} '
-                                 '-ml {ML} -ms {MAX_STALL}"'.format(
+                                 '"python FEW_vals_job.py {DATASET} {SAVE_FILE} {TRIAL} '
+                                 '-ml {ML} -ms {MAX_STALL} -method stall"'.format(
                                                                     OUT_FILE=out_file,
                                                                     ERROR_FILE=error_file,
                                                                     N_CORES=n_cores,
@@ -108,8 +108,8 @@ def main():
                                                                     TRIAL=i,
                                                                     ML=ml,
                                                                     MAX_STALL=val))
-                    print(bjob_line)
-                    # os.system(bjob_line)
+                    # print(bjob_line)
+                    os.system(bjob_line)
 
     ############################################################## classification problems
     for p in clf_problems:
@@ -129,8 +129,8 @@ def main():
                     ################################################# submit job with flag
                     bjob_line = ('bsub -o {OUT_FILE} -e {ERROR_FILE} -n {N_CORES} '
                                  '-J {JOB_NAME} -R "span[hosts=1]" '
-                                 '"python FEW_job.py {DATASET} {SAVE_FILE} {TRIAL} '
-                                 '-ml {ML} -ms {MAX_STALL} --class"'.format(
+                                 '"python FEW__vals_job.py {DATASET} {SAVE_FILE} {TRIAL} '
+                                 '-ml {ML} -ms {MAX_STALL} -method stall --class"'.format(
                                                                     OUT_FILE=out_file,
                                                                     ERROR_FILE=error_file,
                                                                     N_CORES=n_cores,
@@ -140,8 +140,8 @@ def main():
                                                                     TRIAL=i,
                                                                     ML=ml,
                                                                     MAX_STALL=val))
-                    print(bjob_line)
-                    # os.system(bjob_line)
+                    # print(bjob_line)
+                    os.system(bjob_line)
 
 if __name__ == '__main__':
     main()
