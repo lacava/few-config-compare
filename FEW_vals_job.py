@@ -202,17 +202,17 @@ def main():
     scores = cross_val_score(learner,X,y)
     runtime = time.time() - t0
 
-    # print results
-    #print('dataset\tmethod\ttrial\tml\tscore\ttime')
-    #print('\n'+args.INPUT_FILE.split('/')[-1].split('.')[0])
-    #print('\n'+args.METHOD)
-    #print('\n'+args.TRIAL)
-    #print('\n'+str(learner.ml_type))
-    #print('\n'+str(np.mean(scores)))
-    #print('\n'+str(runtime))
+    #print results
+    print('dataset\tmethod\ttrial\tml\tscore\ttime')
+    print('\n'+args.INPUT_FILE.split('/')[-1].split('.')[0])
+    print('\n'+args.METHOD)
+    print('\n'+args.TRIAL)
+    print('\n'+str(learner.ml_type))
+    print('\n'+str(np.mean(scores)))
+    print('\n'+str(runtime))
 
     out_text = '\t'.join([args.INPUT_FILE.split('/')[-1].split('.')[0],
-                          args.METHOD, args.MAX_STALL,
+                          args.METHOD, str(args.MAX_STALL),
                           args.TRIAL,
                           str(learner.ml_type),
                           str(np.mean(scores)),

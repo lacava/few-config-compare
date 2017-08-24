@@ -129,7 +129,7 @@ def main():
                     ################################################# submit job with flag
                     bjob_line = ('bsub -o {OUT_FILE} -e {ERROR_FILE} -n {N_CORES} '
                                  '-J {JOB_NAME} -R "span[hosts=1]" '
-                                 '"python FEW__vals_job.py {DATASET} {SAVE_FILE} {TRIAL} '
+                                 '"python FEW_vals_job.py {DATASET} {SAVE_FILE} {TRIAL} '
                                  '-ml {ML} -ms {MAX_STALL} -method stall --class"'.format(
                                                                     OUT_FILE=out_file,
                                                                     ERROR_FILE=error_file,
